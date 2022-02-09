@@ -15,7 +15,7 @@ public class TextAnalyzer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }cd
+    }
 
     public void analyzeText() throws IOException {
 
