@@ -2,16 +2,20 @@ import java.io.IOException;
 import java.util.*;
 
 public class TextAnalyzer {
-    private static ArrayList<Character> listOfCharsSource;
-    private static ArrayList<Character> listOfCharsStat;
+    private ArrayList<Character> listOfCharsSource;
+    private ArrayList<Character> listOfCharsStat;
     private StringBuilder result = new StringBuilder();
-    private static HashMap<Character, Integer> sourceMap = new HashMap();
-    private static HashMap<Character, Integer> statsMap = new HashMap();
-    private static List<String> sourceFile;
+    private HashMap<Character, Integer> sourceMap = new HashMap();
+    private HashMap<Character, Integer> statsMap = new HashMap();
+    private List<String> sourceFile;
+    private FileService fileService;
+    private Scanner scanner;
 
-    static {
+    public TextAnalyzer(FileService fileService, Scanner scanner) {
+        this.fileService = fileService;
+        this.scanner = scanner;
         try {
-            sourceFile = FileService.readFromFile();
+            sourceFile = fileService.readFromFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -27,7 +31,8 @@ public class TextAnalyzer {
             }
             analyseSingleString(string);
         }
-        FileService.writeToFile("C:\\1\\4.txt", result.toString());
+
+        fileService.convertAndWriteToFile(result.toString());
     }
 
     private void analyseSingleString(String string) {
@@ -43,10 +48,10 @@ public class TextAnalyzer {
         }
     }
 
-    private static void fillAndSortMaps() throws IOException {
-        List<String> statsFile = FileService.readFromFile();
+    private void fillAndSortMaps() throws IOException {
+        List<String> statsFile = fileService.readFromFile();
 
-        char[] chars = Encryption.encryptionKey.toCharArray();
+        char[] chars = FileService.encryptionKey.toCharArray();
         for (char aChar : chars) {
             sourceMap.put(aChar, 0);
             statsMap.put(aChar, 0);
@@ -58,7 +63,7 @@ public class TextAnalyzer {
         listOfCharsStat = convertSortedMapToList(statsMap);
     }
 
-    private static void fillStatChars(List<String> strings, HashMap<Character, Integer> map) {
+    private void fillStatChars(List<String> strings, HashMap<Character, Integer> map) {
         for (String string : strings) {
             for (int i = 0; i < string.length(); i++) {
                 fillMap(string, map, i);
@@ -66,7 +71,7 @@ public class TextAnalyzer {
         }
     }
 
-    private static void fillMap(String string, HashMap<Character, Integer> map, int i) {
+    private void fillMap(String string, HashMap<Character, Integer> map, int i) {
         for (Map.Entry<Character, Integer> entry : map.entrySet())
             if (entry.getKey() == string.charAt(i)) {
                 int countChars = entry.getValue();
@@ -74,7 +79,7 @@ public class TextAnalyzer {
             }
     }
 
-    private static ArrayList<Character> convertSortedMapToList(HashMap<Character, Integer> map) {
+    private ArrayList<Character> convertSortedMapToList(HashMap<Character, Integer> map) {
         Map<Character, Integer> sortedMap = map.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue((a, b) -> b - a))
                 .collect(LinkedHashMap::new,

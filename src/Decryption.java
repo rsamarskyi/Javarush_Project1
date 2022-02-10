@@ -3,12 +3,15 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Decryption {
-    private Scanner scanner = new Scanner(System.in);
-    private static List<String> inputFile;
+    private final Scanner scanner;
+    private List<String> inputFile;
+    private final FileService fileService;
 
-    static {
+    public Decryption(Scanner scanner, FileService fileService) {
+        this.scanner = scanner;
+        this.fileService = fileService;
         try {
-            inputFile = FileService.readFromFile();
+            inputFile = fileService.readFromFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -17,18 +20,17 @@ public class Decryption {
     public String readAndDecrypt() throws IOException {
         System.out.println("Enter encryption key");
         int offset = scanner.nextInt();
-        Encryption encryption = new Encryption();
-
-        return encryption.convertAndWriteToFile(inputFile, (Encryption.encryptionKey.length()) - (offset % Encryption.encryptionKey.length()));
+        int key = (FileService.encryptionKey.length()) - (offset % FileService.encryptionKey.length());
+        String output = fileService.applyLogic(inputFile, key);
+        return fileService.convertAndWriteToFile(output);
     }
 
     public void bruteForce() throws IOException {
-        for (int i = 1; i < Encryption.encryptionKey.length(); i++) {
+        for (int i = 1; i < FileService.encryptionKey.length(); i++) {
             int numberOfAttempts = 0;
             int countValidity = 0;
-            Encryption encryption = new Encryption();
-            var convertedString = encryption.convertAndWriteToFile(inputFile, (Encryption.encryptionKey.length())
-                    - (i % Encryption.encryptionKey.length()));
+            var convertedString = fileService.applyLogic(inputFile, (FileService.encryptionKey.length())
+                    - (i % FileService.encryptionKey.length()));
             StringBuilder sb = new StringBuilder(convertedString);
             char[] chars = sb.toString().toCharArray();
 
@@ -45,6 +47,7 @@ public class Decryption {
                 System.out.println(sb.substring(0, 100));
                 System.out.println("Number of attempts: " + numberOfAttempts);
                 System.out.println(System.lineSeparator());
+                fileService.convertAndWriteToFile(sb.toString());
                 break;
             }
         }
