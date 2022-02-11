@@ -19,7 +19,7 @@ public class Decryption {
 
     public String readAndDecrypt() throws IOException {
         System.out.println("Enter encryption key");
-        int offset = scanner.nextInt();
+        int offset = Integer.parseInt(scanner.nextLine());
         int key = (FileService.encryptionKey.length()) - (offset % FileService.encryptionKey.length());
         String output = fileService.applyLogic(inputFile, key);
         return fileService.convertAndWriteToFile(output);
